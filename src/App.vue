@@ -1,22 +1,17 @@
 <script setup>
 import { provide, ref, watch, computed } from 'vue'
-import axios from 'axios'
 
 import HeaderComponent from './components/HeaderComponent.vue'
-
 import Drawer from './components/Drawer.vue'
 
 /* Корзина */
 const cart = ref([])
 const isVisibleDrawer = ref(false)
+
 const totalPrice = computed(() =>
   cart.value.reduce((acc, item) => acc + item.price, 0),
 )
 const vatPrice = computed(() => Math.round(totalPrice.value * 0.05))
-const isCartEmpty = computed(() => cart.value.length === 0)
-const cartButtonDisabled = computed(
-  () => isLoadingOrder.value || isCartEmpty.value,
-)
 
 const closeDrawer = () => {
   isVisibleDrawer.value = false
@@ -60,8 +55,6 @@ provide('cart', {
     v-if="isVisibleDrawer"
     :total-price="totalPrice"
     :vat-price="vatPrice"
-    :is-disabled-button="cartButtonDisabled"
-    @create-order="createOrder"
   />
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14 mb-14">
     <HeaderComponent :total-price="totalPrice" @open-drawer="openDrawer" />
