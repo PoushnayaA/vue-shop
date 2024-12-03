@@ -37,6 +37,40 @@ const fetchFavorites = async () => {
   }
 }
 
+// const fetchItems = async () => {
+//   try {
+//     const params = {
+//       sortBy: filters.sortBy,
+//     }
+
+//     if (filters.searchQuery) {
+//       params.title = `*${filters.searchQuery}*`
+//     }
+
+//     const { data } = await axios.get(
+//       `https://0bc60d73538f2561.mokky.dev/items`,
+//       { params },
+//     )
+
+//     items.value = data.map(obj => ({
+//       ...obj,
+//       isFavorite: false,
+//       favoriteId: null,
+//       isAdded: false,
+//     }))
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
+
+watch(cart, () => {
+  items.value = items.value.map(item => ({
+    ...item,
+    isAdded: false,
+  }))
+})
+
+//работает для пересортировки
 const fetchItems = async () => {
   try {
     const params = {
@@ -52,54 +86,20 @@ const fetchItems = async () => {
       { params },
     )
 
-    items.value = data.map(obj => ({
-      ...obj,
-      isFavorite: false,
-      favoriteId: null,
-      isAdded: false,
-    }))
+    // Обновляем items с учетом избранных
+    items.value = data.map(obj => {
+      const existingItem = items.value.find(item => item.id === obj.id)
+      return {
+        ...obj,
+        isFavorite: existingItem ? existingItem.isFavorite : false,
+        favoriteId: existingItem ? existingItem.favoriteId : null,
+        isAdded: false,
+      }
+    })
   } catch (err) {
     console.log(err)
   }
 }
-
-watch(cart, () => {
-  items.value = items.value.map(item => ({
-    ...item,
-    isAdded: false,
-  }))
-})
-
-//работает для пересортировки
-// const fetchItems = async () => {
-//   try {
-//     const params = {
-//       sortBy: filters.sortBy,
-//     };
-
-//     if (filters.searchQuery) {
-//       params.title = `*${filters.searchQuery}*`;
-//     }
-
-//     const { data } = await axios.get(
-//       `https://0bc60d73538f2561.mokky.dev/items`,
-//       { params },
-//     );
-
-//     // Обновляем items с учетом избранных
-//     items.value = data.map(obj => {
-//       const existingItem = items.value.find(item => item.id === obj.id);
-//       return {
-//         ...obj,
-//         isFavorite: existingItem ? existingItem.isFavorite : false,
-//         favoriteId: existingItem ? existingItem.favoriteId : null,
-//         isAdded: false,
-//       };
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
 
 watch(filters, fetchItems)
 watch(
