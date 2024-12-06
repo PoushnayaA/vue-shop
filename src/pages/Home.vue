@@ -1,4 +1,5 @@
 <script setup>
+import VueSelect from 'vue3-select-component'
 import axios from 'axios'
 import debounce from 'lodash.debounce'
 import CardList from '../components/CardList.vue'
@@ -10,6 +11,8 @@ const filters = reactive({
   sortBy: 'title',
   searchQuery: '',
 })
+
+const selectedOption = ref('')
 
 const items = ref([])
 
@@ -36,32 +39,6 @@ const fetchFavorites = async () => {
     console.log(err)
   }
 }
-
-// const fetchItems = async () => {
-//   try {
-//     const params = {
-//       sortBy: filters.sortBy,
-//     }
-
-//     if (filters.searchQuery) {
-//       params.title = `*${filters.searchQuery}*`
-//     }
-
-//     const { data } = await axios.get(
-//       `https://0bc60d73538f2561.mokky.dev/items`,
-//       { params },
-//     )
-
-//     items.value = data.map(obj => ({
-//       ...obj,
-//       isFavorite: false,
-//       favoriteId: null,
-//       isAdded: false,
-//     }))
-//   } catch (err) {
-//     console.log(err)
-//   }
-// }
 
 watch(cart, () => {
   items.value = items.value.map(item => ({
@@ -111,8 +88,10 @@ watch(
 )
 
 const onChangeSelect = event => {
-  filters.sortBy = event.target.value
+  filters.sortBy = selectedOption.value
 }
+
+watch(selectedOption, onChangeSelect)
 
 const onChangeSearchInput = debounce(event => {
   filters.searchQuery = event.target.value
@@ -165,24 +144,27 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-between items-center">
-    <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
-
-    <div class="flex items-center gap-4">
-      <select
+  <div class="flex flex-col lg:flex-row justify-between lg:items-center">
+    <h2 class="text-xl md:text-3xl font-bold mb-8 lg:mb-0">Все кроссовки</h2>
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+      <VueSelect
+        class="custom-select"
+        v-model="selectedOption"
         @change="onChangeSelect"
-        class="py-2 px-3 border rounded-md outline-none"
-      >
-        <option value="name">По названию</option>
-        <option value="price">Сначала дешевые</option>
-        <option value="-price">Сначала дорогие</option>
-      </select>
-      <div class="relative">
+        :options="[
+          { label: 'По названию', value: 'name' },
+          { label: 'Сначала дешевые', value: 'price' },
+          { label: 'Сначала дорогие', value: '-price' },
+        ]"
+        placeholder="Выберите сортировку"
+      />
+
+      <div class="relative w-50">
         <img src="/search.svg" alt="Поиск" class="absolute top-3 left-4" />
         <input
           @input="onChangeSearchInput"
           placeholder="Поиск..."
-          class="border rounded-md py-2 pl-11 pr-4 outline-none focus:border-gray-400"
+          class="border rounded-md py-2 pl-11 pr-4 outline-none focus:border-gray-400 w-full"
         />
       </div>
     </div>
@@ -195,3 +177,4 @@ onMounted(async () => {
     />
   </div>
 </template>
+<style scoped></style>

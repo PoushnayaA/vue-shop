@@ -56,10 +56,12 @@ provide('cart', {
     :total-price="totalPrice"
     :vat-price="vatPrice"
   />
-  <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14 mb-14">
+  <div
+    class="bg-white w-11/12 md:w-4/5 m-auto rounded-xl shadow-xl mt-8 mb-8 md:mt-10 md:mb-10"
+  >
     <HeaderComponent :total-price="totalPrice" @open-drawer="openDrawer" />
 
-    <div class="p-10">
+    <div class="px-4 py-6 md:p-10">
       <Home />
       <router-view></router-view>
     </div>
